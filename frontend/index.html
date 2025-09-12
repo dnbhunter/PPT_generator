@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNB Presentation Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .generate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .download-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .download-link:hover {
+            background: #45a049;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            color: #666;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #4caf50;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">DNB</div>
+            <h1>DNB Presentation Generator</h1>
+            <p class="subtitle">AI-Powered Presentation Creation for DNB Bank</p>
+        </div>
+        
+        <form id="presentationForm">
+            <div class="form-group">
+                <label for="title">Presentation Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter your presentation title..." required>
+            </div>
+            
+            <div class="form-group">
+                <label for="content">Content Description</label>
+                <textarea id="content" name="content" placeholder="Describe what you want in your presentation. Be as detailed as possible - include key points, data, topics, and any specific requirements..." required></textarea>
+            </div>
+            
+            <div class="options-grid">
+                <div class="form-group">
+                    <label for="template">Template Style</label>
+                    <select id="template" name="template">
+                        <option value="corporate">Corporate (Default)</option>
+                        <option value="modern">Modern & Clean</option>
+                        <option value="professional">Professional</option>
+                        <option value="creative">Creative</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="slides">Number of Slides</label>
+                    <select id="slides" name="slides">
+                        <option value="5">5 slides</option>
+                        <option value="10" selected>10 slides</option>
+                        <option value="15">15 slides</option>
+                        <option value="20">20 slides</option>
+                        <option value="25">25 slides</option>
+                    </select>
+                </div>
+            </div>
+            
+            <ul class="feature-list">
+                <li>AI-powered content generation</li>
+                <li>DNB brand compliance</li>
+                <li>Professional templates</li>
+                <li>Automatic chart generation</li>
+                <li>Quality assurance checks</li>
+            </ul>
+            
+            <button type="submit" class="generate-btn" id="generateBtn">
+                Generate Presentation
+            </button>
+        </form>
+        
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        document.getElementById('presentationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                title: formData.get('title'),
+                content: formData.get('content'),
+                template: formData.get('template'),
+                max_slides: parseInt(formData.get('slides'))
+            };
+            
+            const generateBtn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            status.style.display = 'block';
+            status.className = 'status loading';
+            status.innerHTML = '🔄 Creating your presentation... This may take a few minutes.';
+            
+            try {
+                // First, check if the API is available
+                const healthResponse = await fetch(`${API_BASE}/health`);
+                if (!healthResponse.ok) {
+                    throw new Error('API service is not available');
+                }
+                
+                // Generate presentation
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    throw new Error(errorData.message || `HTTP ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Show success
+                status.className = 'status success';
+                status.innerHTML = `
+                    ✅ Presentation generated successfully!
+                    <br>
+                    <a href="${result.download_url}" class="download-link" download>
+                        📥 Download Presentation
+                    </a>
+                `;
+                
+                // Reset form
+                this.reset();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                status.className = 'status error';
+                status.innerHTML = `
+                    ❌ Error: ${error.message}
+                    <br><small>Please check that the API server is running and try again.</small>
+                `;
+            } finally {
+                // Reset button
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Presentation';
+            }
+        });
+        
+        // Test API connection on page load
+        async function testAPIConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    console.log('✅ API connection successful');
+                } else {
+                    console.warn('⚠️ API responded but with error status');
+                }
+            } catch (error) {
+                console.warn('⚠️ API connection failed:', error.message);
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                status.className = 'status error';
+                status.innerHTML = '⚠️ API server connection failed. Please ensure the server is running on http://localhost:8000';
+            }
+        }
+        
+        // Test connection when page loads
+        window.addEventListener('load', testAPIConnection);
+    </script>
+</body>
+</html>
