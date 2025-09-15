@@ -1,6 +1,217 @@
-# DNB Presentation Generator - Architecture Diagram
+# DNB Presentation Generator - Architecture Diagra    %% Core Services (Actually Used)
+    subgraph "Core Services"
+        CONFIG[⚙️ Configuration<br/>src/core/config.py]
+        EXCEPT[⚠️ Exception Handling<br/>src/core/exceptions.py]
+    end# Current Unified Architecture (Post-Cleanup)
 
-## Current Unified Architecture (Post-Cleanup)
+### Simplified Overview
+
+```mermaid
+graph TB
+    %% User Interface Layer
+    subgraph "User Interface"
+        USER[👤 User] 
+        UI[🌐 Web Interface<br/>frontend/index.html]
+        USER --> |Fill Form| UI
+    end
+    
+    %% API Gateway Layer
+    subgraph "FastAPI Application"
+        MAIN[⚡ Main Server<br/>src/main.py]
+        GEN[📝 Generation Endpoint<br/>POST /api/v1/generate]
+        PRES[📥 Download Endpoint<br/>GET /presentations/{id}/download]
+        HEALTH[❤️ Health Check<br/>GET /health]
+        STATIC[🗂️ Static Files<br/>/frontend]
+        
+        MAIN --> GEN
+        MAIN --> PRES
+        MAIN --> HEALTH
+        MAIN --> STATIC
+    end
+    
+    %% Multi-Agent System
+    subgraph "AI Agent System"
+        ORCH[🎯 Multi-Agent Orchestrator<br/>src/agents/orchestrator.py]
+        
+        subgraph "Specialized Agents"
+            PLAN[📋 Planner<br/>Requirements Analysis]
+            RES[🔍 Research<br/>Content Research]
+            CONT[✍️ Content<br/>Slide Generation]
+            ARCH[🏗️ Architect<br/>Structure Design]
+            QA[✅ QA/Compliance<br/>Quality Control]
+            EXP[📤 Export<br/>Final Processing]
+        end
+        
+        ORCH --> PLAN
+        ORCH --> RES
+        ORCH --> CONT
+        ORCH --> ARCH
+        ORCH --> QA
+        ORCH --> EXP
+    end
+    
+    %% Core Services (Actually Used)
+    subgraph "Core Services"
+        CONFIG[⚙️ Configuration<br/>src/core/config.py]
+        EXCEPT[⚠️ Exception Handling<br/>src/core/exceptions.py]
+        LOGGING[� Built-in Logging<br/>Python logging module]
+    end
+    
+    %% AI Services
+    subgraph "AI Integration"
+        AZURE[☁️ Azure OpenAI<br/>langchain_openai.AzureChatOpenAI]
+    end
+    
+    %% File Generation & Storage
+    subgraph "File Processing"
+        PPTX[📄 python-pptx<br/>PowerPoint Library]
+        EXPORTS[📁 File Storage<br/>exports/ directory]
+    end
+    
+    %% Testing & Automation
+    subgraph "Development Tools"
+        SCRIPT[🔧 Automation Script<br/>run_minimal.ps1]
+    end
+    
+    %% Unused Services (Present but Not Active)
+    subgraph "Unused Services" 
+        style UNUSED fill:#ffebee,stroke:#c62828,stroke-dasharray: 5 5
+        UNUSED[❌ Cache Service<br/>❌ Database Service<br/>(Present but not integrated)]
+    end
+    
+    %% Main Flow Connections
+    UI --> |HTTP POST| GEN
+    GEN --> |Initialize| ORCH
+    
+    %% Agent Service Connections (Active)
+    ORCH --> |Use| CONFIG
+    ORCH --> |Handle| EXCEPT
+    ORCH --> |Query| AZURE
+    
+    %% File Generation Flow
+    EXP --> |Generate| PPTX
+    PPTX --> |Save| EXPORTS
+    
+    %% Download Flow
+    UI --> |HTTP GET| PRES
+    PRES --> |Retrieve| EXPORTS
+    EXPORTS --> |FileResponse| UI
+    UI --> |📥 Download| USER
+    
+    %% Development Flow
+    SCRIPT -.-> |Test| MAIN
+    SCRIPT -.-> |Validate| HEALTH
+    SCRIPT -.-> |E2E Test| GEN
+    
+    %% Styling
+    classDef userLayer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef apiLayer fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef agentLayer fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef coreLayer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef aiLayer fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef fileLayer fill:#f1f8e9,stroke:#689f38,stroke-width:2px
+    classDef devLayer fill:#e0f2f1,stroke:#00695c,stroke-width:1px,stroke-dasharray: 3 3
+    classDef unusedLayer fill:#ffebee,stroke:#c62828,stroke-width:1px,stroke-dasharray: 5 5
+    
+    class USER,UI userLayer
+    class MAIN,GEN,PRES,HEALTH,STATIC apiLayer
+    class ORCH,PLAN,RES,CONT,ARCH,QA,EXP agentLayer
+    class CONFIG,EXCEPT coreLayer
+    class AZURE aiLayer
+    class PPTX,EXPORTS fileLayer
+    class SCRIPT devLayer
+    class UNUSED unusedLayer
+```
+
+## Architecture Explanation
+
+### Overview
+This diagram represents the **unified, post-cleanup architecture** of the DNB Presentation Generator. The system has been simplified from a complex multi-router structure to a streamlined, single-entrypoint architecture that leverages AI agents for intelligent presentation generation.
+
+### Layer Breakdown
+
+#### 🔵 **User Interface Layer** (Blue)
+- **Web Interface** (`frontend/index.html`): Simple, clean form-based interface where users input presentation requirements
+- **User Flow**: Fill form → Submit → Download generated presentation
+
+#### 🟢 **FastAPI Application Layer** (Green)
+- **Unified Server** (`src/main.py`): Single entrypoint replacing complex router aggregation
+- **Generation Endpoint**: `POST /api/v1/generate` - Processes presentation requests
+- **Download Endpoint**: `GET /presentations/{id}/download` - Serves generated PPTX files
+- **Health Check**: `GET /health` - System status monitoring
+- **Static Files**: Serves frontend assets directly
+
+#### 🟠 **AI Agent System Layer** (Orange)
+- **Multi-Agent Orchestrator**: Coordinates 6 specialized AI agents using LangGraph workflow
+- **Specialized Agents**:
+  - **Planner**: Analyzes requirements and creates presentation structure
+  - **Research**: Gathers relevant content and information
+  - **Content**: Generates slide text and messaging
+  - **Architect**: Designs presentation flow and layout
+  - **QA/Compliance**: Ensures quality and DNB compliance standards
+  - **Export**: Finalizes and prepares presentation for generation
+
+#### 🟣 **Core Services Layer** (Purple)
+- **Configuration** (`src/core/config.py`): Settings management and environment configuration
+- **Exception Handling** (`src/core/exceptions.py`): Custom error handling for workflow management
+
+#### 🔷 **AI Integration Layer** (Light Blue)
+- **Azure OpenAI**: LangChain integration with `AzureChatOpenAI` for AI-powered content generation
+- **Direct Integration**: Agents communicate directly with Azure OpenAI through LangChain
+
+#### 🟢 **File Processing Layer** (Light Green)
+- **python-pptx Library**: Generates actual PowerPoint files (29KB+ validated outputs)
+- **File Storage**: `exports/` directory for generated presentations
+
+#### 🔘 **Development Tools** (Gray Dashed)
+- **Automation Script** (`run_minimal.ps1`): End-to-end testing and validation
+
+#### ❌ **Unused Services** (Red Dashed)
+- **Cache Service**: Present but not integrated into current workflow
+- **Database Service**: Present but not integrated into current workflow
+
+### Key Data Flow
+
+1. **User Input**: User fills web form with presentation requirements
+2. **API Processing**: FastAPI routes request to Multi-Agent Orchestrator
+3. **AI Orchestration**: Orchestrator coordinates specialized agents in sequence
+4. **Content Generation**: Agents use Azure OpenAI to generate intelligent content
+5. **File Creation**: Export agent uses python-pptx to create actual PowerPoint file
+6. **File Storage**: Generated PPTX saved to exports directory
+7. **Download**: User downloads completed presentation via download endpoint
+
+### Architecture Decisions
+
+#### ✅ **Unified vs. Complex Routing**
+- **Before**: Multiple nested routers, complex middleware chains
+- **After**: Single `src/main.py` entrypoint with direct router inclusion
+- **Benefit**: Simplified debugging, clearer request flow, easier maintenance
+
+#### ✅ **Agent-Based Intelligence**
+- **LangGraph Workflow**: State management between specialized agents
+- **Specialized Roles**: Each agent has specific domain expertise
+- **Quality Control**: Built-in QA/Compliance agent ensures output standards
+
+#### ✅ **Direct AI Integration**
+- **Azure OpenAI**: Enterprise-grade AI through LangChain abstraction
+- **No Middleware**: Direct agent-to-AI communication for efficiency
+- **Configuration-Driven**: Settings managed through core config module
+
+#### ✅ **Real File Generation**
+- **python-pptx**: Industry-standard PowerPoint file creation
+- **Validated Output**: 29KB+ files with proper MIME types
+- **Local Storage**: Simple file system storage in exports directory
+
+### System Benefits
+
+1. **Simplified Architecture**: Reduced complexity while maintaining functionality
+2. **AI-Powered Intelligence**: Specialized agents provide domain expertise
+3. **Enterprise Integration**: Azure OpenAI ensures enterprise-grade AI capabilities
+4. **Real Output**: Generates actual PowerPoint files, not mock data
+5. **Maintainable**: Clear separation of concerns, easy to debug and extend
+6. **Testable**: Automated end-to-end validation through PowerShell script
+
+### Detailed Architecture
 
 ```mermaid
 graph TB
